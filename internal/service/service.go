@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"math/rand"
 	"mini-service-Citatnik-/internal/model"
@@ -19,14 +20,21 @@ type QuoteService struct {
 	nextID int
 }
 
-func NewQuoteService() *QuoteService {
+type IQuoteService interface {
+	AddQuote(ctx context.Context, q *model.Quote) *model.Quote
+	GetAll(ctx context.Context, author string) []*model.Quote
+	GetRandom(ctx context.Context) (*model.Quote, error)
+	Delete(ctx context.Context, id int64) error
+}
+
+func NewQuoteService() IQuoteService {
 	return &QuoteService{
 		quotes: make(map[int]*model.Quote),
 		nextID: 1,
 	}
 }
 
-func (s *QuoteService) AddQuote(q *model.Quote) *model.Quote {
+func (s *QuoteService) AddQuote(ctx context.Context, q *model.Quote) *model.Quote {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -37,7 +45,7 @@ func (s *QuoteService) AddQuote(q *model.Quote) *model.Quote {
 	return q
 }
 
-func (s *QuoteService) GetAll(author string) []*model.Quote {
+func (s *QuoteService) GetAll(ctx context.Context, author string) []*model.Quote {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -58,7 +66,7 @@ func (s *QuoteService) GetAll(author string) []*model.Quote {
 	return res
 }
 
-func (s *QuoteService) GetRandom() (*model.Quote, error) {
+func (s *QuoteService) GetRandom(ctx context.Context) (*model.Quote, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -75,7 +83,7 @@ func (s *QuoteService) GetRandom() (*model.Quote, error) {
 	return allQuotes[rand.Intn(len(allQuotes))], nil
 }
 
-func (s *QuoteService) Delete(id int64) error {
+func (s *QuoteService) Delete(ctx context.Context, id int64) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 

@@ -12,16 +12,18 @@ import (
 )
 
 type QuoteHandler struct {
-	service *service.QuoteService
+	service service.IQuoteService
 }
 
-func NewQuoteHandler() *QuoteHandler {
+func NewQuoteHandler(s service.IQuoteService) *QuoteHandler {
 	return &QuoteHandler{
-		service: service.NewQuoteService(),
+		service: s,
 	}
 }
 
 func (h *QuoteHandler) CreateQuote(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	var q model.Quote
 	if err := json.NewDecoder(r.Body).Decode(&q); err != nil {
 		http.Error(w, "Недопустимое тело запроса", http.StatusBadRequest)
@@ -33,22 +35,24 @@ func (h *QuoteHandler) CreateQuote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	created := h.service.AddQuote(&q)
+	created := h.service.AddQuote(ctx, &q)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(created)
 }
 
 func (h *QuoteHandler) GetQuotes(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	author := r.URL.Query().Get("author")
-	quotes := h.service.GetAll(author)
+	quotes := h.service.GetAll(ctx, author)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(quotes)
 }
 
 func (h *QuoteHandler) GetRandomQuote(w http.ResponseWriter, r *http.Request) {
-	q, err := h.service.GetRandom()
+	ctx := r.Context()
+	q, err := h.service.GetRandom(ctx)
 	if err == service.ErrNotFound {
 		http.Error(w, "Цитаты не найдены", http.StatusNotFound)
 		return
@@ -58,6 +62,7 @@ func (h *QuoteHandler) GetRandomQuote(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *QuoteHandler) DeleteQuote(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	vars := mux.Vars(r)
 	idStr := vars["id"]
 	id, err := strconv.ParseInt(idStr, 10, 64)
@@ -66,7 +71,7 @@ func (h *QuoteHandler) DeleteQuote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.service.Delete(id)
+	err = h.service.Delete(ctx, id)
 	if err == service.ErrNotFound {
 		http.Error(w, "Цитата не найдена", http.StatusNotFound)
 		return

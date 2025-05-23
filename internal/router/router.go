@@ -8,10 +8,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func NewRouter() http.Handler {
-
+func NewRouter(h *handler.QuoteHandler) http.Handler {
 	r := mux.NewRouter()
-	h := handler.NewQuoteHandler()
 
 	r.HandleFunc("/quotes", h.CreateQuote).Methods(http.MethodPost)
 	r.HandleFunc("/quotes", h.GetQuotes).Methods(http.MethodGet)
