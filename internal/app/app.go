@@ -11,7 +11,7 @@ import (
 
 func Run() error {
 	s := service.NewQuoteService()
-	var h handler.IQuoteHandler = handler.NewQuoteHandler(s)
+	h := handler.NewQuoteHandler(s)
 
 	r := router.NewRouter(h)
 
