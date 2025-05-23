@@ -3,12 +3,13 @@ package router
 import (
 	"net/http"
 
-	"mini-service-Citatnik-/internal/handler"
+	"mini-service-Citatnik-/internal/transport/handler"
 
 	"github.com/gorilla/mux"
 )
 
-func NewRouter(h *handler.QuoteHandler) http.Handler {
+func NewRouter(h handler.IQuoteHandler) http.Handler {
+
 	r := mux.NewRouter()
 
 	r.HandleFunc("/quotes", h.CreateQuote).Methods(http.MethodPost)

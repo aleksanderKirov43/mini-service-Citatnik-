@@ -11,11 +11,18 @@ import (
 	"github.com/gorilla/mux"
 )
 
+type IQuoteHandler interface {
+	CreateQuote(w http.ResponseWriter, r *http.Request)
+	GetQuotes(w http.ResponseWriter, r *http.Request)
+	GetRandomQuote(w http.ResponseWriter, r *http.Request)
+	DeleteQuote(w http.ResponseWriter, r *http.Request)
+}
+
 type QuoteHandler struct {
 	service service.IQuoteService
 }
 
-func NewQuoteHandler(s service.IQuoteService) *QuoteHandler {
+func NewQuoteHandler(s service.IQuoteService) IQuoteHandler {
 	return &QuoteHandler{
 		service: s,
 	}

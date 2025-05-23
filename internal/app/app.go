@@ -2,16 +2,16 @@ package app
 
 import (
 	"log"
-	"mini-service-Citatnik-/internal/handler"
 	"net/http"
 
-	"mini-service-Citatnik-/internal/router"
 	"mini-service-Citatnik-/internal/service"
+	"mini-service-Citatnik-/internal/transport/handler"
+	"mini-service-Citatnik-/internal/transport/router"
 )
 
 func Run() error {
 	s := service.NewQuoteService()
-	h := handler.NewQuoteHandler(s)
+	var h handler.IQuoteHandler = handler.NewQuoteHandler(s)
 
 	r := router.NewRouter(h)
 

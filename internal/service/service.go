@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"math/rand"
-	"mini-service-Citatnik-/internal/model"
 	"strings"
 	"sync"
 	"time"
+
+	"mini-service-Citatnik-/internal/model"
 )
 
 var (
